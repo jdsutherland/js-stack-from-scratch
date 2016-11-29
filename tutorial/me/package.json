@@ -6,7 +6,9 @@
   "scripts": {
     "start": "gulp"
   },
-  "dependencies": {},
+  "dependencies": {
+    "babel-polyfill": "^6.16.0"
+  },
   "devDependencies": {
     "babel-preset-latest": "^6.16.0",
     "del": "^2.2.2",
@@ -25,6 +27,9 @@
     ]
   },
   "eslintConfig": {
+    "env": {
+      "browser": true
+    },
     "extends": "airbnb",
     "plugins": [
       "import"
