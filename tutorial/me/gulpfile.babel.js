@@ -1,14 +1,15 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-console */
+/* eslint-disable import/no-extraneous-dependencies, comma-dangle, no-console */
 import babel from 'gulp-babel';
 import del from 'del';
 import eslint from 'gulp-eslint';
 import gulp from 'gulp';
+import mocha from 'gulp-mocha';
 import webpack from 'webpack-stream';
 import webpackConfig from './webpack.config.babel';
 
 const paths = {
   allSrcJs: 'src/**/*.js',
+  allLibTests: 'lib/test/**/*.js',
   serverSrcJs: 'src/server/**/*.js.js?(x)',
   sharedSrcJs: 'src/shared/**/*.js.js?(x)',
   clientEntryPoint: 'src/client/app.jsx',
@@ -27,7 +28,7 @@ gulp.task('lint', () =>
   ])
     .pipe(eslint())
     .pipe(eslint.format())
-    .pipe(eslint.failAfterError()),
+    .pipe(eslint.failAfterError())
 );
 
 gulp.task('clean', () => del([
@@ -38,17 +39,22 @@ gulp.task('clean', () => del([
 gulp.task('build', ['lint', 'clean'], () =>
   gulp.src(paths.allSrcJs)
     .pipe(babel())
-    .pipe(gulp.dest(paths.libDir)),
+    .pipe(gulp.dest(paths.libDir))
 );
 
-gulp.task('main', ['lint', 'clean'], () =>
+gulp.task('main', ['test'], () =>
   gulp.src(paths.clientEntryPoint)
     .pipe(webpack(webpackConfig))
-    .pipe(gulp.dest(paths.distDir)),
+    .pipe(gulp.dest(paths.distDir))
 );
 
 gulp.task('watch', () => {
   gulp.watch(paths.allSrcJs, ['main']);
 });
+
+gulp.task('test', ['build'], () =>
+  gulp.src(paths.allLibTests)
+    .pipe(mocha())
+);
 
 gulp.task('default', ['watch', 'main']);
